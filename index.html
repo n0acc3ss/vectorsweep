@@ -29,6 +29,9 @@
   --green:   #39ff88;
   --red:     #ff4f6a;
   --amber:   #ffaa33;
+  --accent:      var(--pink);
+  --accent-soft: rgba(240,60,168,0.12);
+  --red-soft:    rgba(255,79,106,0.12);
   --mono: 'Share Tech Mono', monospace;
   --orb:  'Orbitron', sans-serif;
   --sans: 'DM Sans', sans-serif;
@@ -575,6 +578,37 @@ code { font-family: var(--mono); font-size: 12px; color: var(--pink); }
 }
 .summary b { color:var(--text); }
 
+/* ── Confirm modal ── */
+.scrim {
+  display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(5,4,10,0.72);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:20px;
+}
+.scrim.open { display:flex; }
+.modal {
+  width:100%;max-width:420px;
+  background:var(--mantle);border:1px solid var(--s1);
+  border-radius:var(--radius);
+  padding:22px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.5), 0 0 30px var(--glow2);
+}
+.modal-icon {
+  width:40px;height:40px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:14px;
+}
+.modal-title { font-family:var(--orb);font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px; }
+.modal-text { font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--sub);margin-bottom:16px; }
+.modal-summary {
+  display:flex;flex-direction:column;gap:6px;
+  background:var(--crust);border:1px solid var(--s0);border-radius:8px;
+  padding:10px 12px;margin-bottom:18px;
+}
+.modal-summary > div { display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:11.5px; }
+.modal-summary > div span:first-child { color:var(--ov0); }
+.modal-summary > div span:last-child { color:var(--text);text-align:right; }
+.modal-actions { display:flex;justify-content:flex-end;gap:10px; }
+
 /* ── Row helper ── */
 .row { display:flex;gap:10px; }
 
@@ -825,6 +859,22 @@ code { font-family: var(--mono); font-size: 12px; color: var(--pink); }
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
       Cancel
     </button>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="scrim" id="modalScrim">
+  <div class="modal">
+    <div class="modal-icon" id="modalIcon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <div class="modal-title" id="modalTitle">Process files?</div>
+    <div class="modal-text" id="modalText"></div>
+    <div class="modal-summary" id="modalSummary"></div>
+    <div class="modal-actions">
+      <button class="btn outline" id="modalCancel">Cancel</button>
+      <button class="btn primary" id="modalConfirm">Confirm &amp; run</button>
+    </div>
   </div>
 </div>
 
@@ -1267,7 +1317,7 @@ code { font-family: var(--mono); font-size: 12px; color: var(--pink); }
     state.running = true; state.cancel = false;
     $("#runBtn").disabled = true; $("#previewBtn").disabled = true;
     $("#pickBtn").disabled = true;
-    $("#stopBtn").style.display = dryRun ? "none" : "inline-flex";
+    $("#cancelBtn").style.display = dryRun ? "none" : "inline-flex";
     $("#consoleHead").classList.add("running");
     setStats({ scanned: 0, matched: 0, written: 0 });
     setProgress(dryRun ? "Dry run — scanning…" : "Processing…", null);
@@ -1333,7 +1383,7 @@ code { font-family: var(--mono); font-size: 12px; color: var(--pink); }
     setProgress(state.cancel ? "Stopped" : (dryRun ? "Dry run complete" : "Complete"), state.cancel ? null : 100);
     log(`──── ${dryRun ? "DRY RUN" : "DONE"}: ${stats.scanned.toLocaleString()} scanned · ${stats.matched.toLocaleString()} matched · ${stats.totalRepl.toLocaleString()} replacements · ${stats.changed.toLocaleString()} changed${dryRun ? "" : ` · ${stats.written.toLocaleString()} written`}${saved !== 0 ? ` · ${saved > 0 ? "−" : "+"}${fmtBytes(Math.abs(saved))}` : ""}${stats.errors ? ` · ${stats.errors} errors` : ""} ────`, "head");
     state.running = false;
-    $("#stopBtn").style.display = "none";
+    $("#cancelBtn").style.display = "none";
     $("#consoleHead").classList.remove("running");
     $("#pickBtn").disabled = false;
     updateReady();
@@ -1344,7 +1394,7 @@ code { font-family: var(--mono); font-size: 12px; color: var(--pink); }
     return (b / 1048576).toFixed(2) + " MB";
   }
 
-  $("#stopBtn").onclick = () => { state.cancel = true; log("Stopping…", "err"); };
+  $("#cancelBtn").onclick = () => { state.cancel = true; log("Stopping…", "err"); };
 
   // ---------- Buttons & confirm modal ----------
   $("#previewBtn").onclick = () => { if (!$("#previewBtn").disabled) execute(true); };
