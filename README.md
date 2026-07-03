@@ -1,10 +1,11 @@
 # Vector Sweep
 
+<img src="https://i.ibb.co/HLmzdwdg/logo-vector-sweep.webp" align="center">
 Find & replace and optimize across thousands of SVG files — entirely in your browser, no upload, no server, no build step.
 
 Vector Sweep is a single-page, single-file web app that lets you point at a local folder of `.svg` icons and batch-recolor, find-and-replace, or strip cruft from every file in it. Everything runs client-side using the [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API) — your files never leave your machine.
 
-**[Live app →](https://n0acc3ss.github.io/vectorsweep/)**
+**[Live app: → https://n0acc3ss.github.io/vectorsweep/](https://n0acc3ss.github.io/vectorsweep/)**``
 
 ## Features
 
